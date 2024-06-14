@@ -1,0 +1,22 @@
+Name: seckill.rpc
+ListenOn: 127.0.0.1:2009
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: seckill.rpc
+
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass: 123456
+  Type: mode
+
+ProductRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: product.rpc
+
+Kafka:
+  Addrs:
+    - 127.0.0.1:9092
+  Topic: seckill-topic

@@ -1,0 +1,70 @@
+global:
+  scrape_interval:
+  external_labels:
+    monitor: 'codelab-monitor'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['127.0.0.1:9090']
+
+  - job_name: 'order-api'
+    static_configs:
+      - targets: [ 'gomall:4001' ]
+        labels:
+          job: order-api
+          app: order-api
+          env: dev
+  - job_name: 'order-rpc'
+    static_configs:
+      - targets: [ 'gomall:4002' ]
+        labels:
+          job: order-rpc
+          app: order-rpc
+          env: dev
+  - job_name: 'payment-api'
+    static_configs:
+      - targets: [ 'gomall:4003' ]
+        labels:
+          job: payment-api
+          app: payment-api
+          env: dev
+  - job_name: 'payment-rpc'
+    static_configs:
+      - targets: [ 'gomall:4004' ]
+        labels:
+          job: payment-rpc
+          app: payment-rpc
+          env: dev
+
+
+  - job_name: 'product-api'
+    static_configs:
+      - targets: [ 'gomall:4005' ]
+        labels:
+          job: product-api
+          app: product-api
+          env: dev
+  - job_name: 'product-rpc'
+    static_configs:
+      - targets: [ 'gomall:4006' ]
+        labels:
+          job: product-rpc
+          app: product-rpc
+          env: dev
+
+  - job_name: 'user-api'
+    static_configs:
+      - targets: ['gomall:4007']
+        labels:
+          job: user-api
+          app: user-api
+          env: dev
+  - job_name: 'user-rpc'
+    static_configs:
+      - targets: ['gomall:4008']
+        labels:
+          job: user-rpc
+          app: user-rpc
+          env: dev

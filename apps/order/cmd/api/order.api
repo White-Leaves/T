@@ -1,0 +1,95 @@
+syntax  = "v1"
+
+info(
+	title: "订单"
+	version:"v1"
+)
+
+type Orders {
+	Id     string `json:"id"`     //订单id
+	Sn     string `json:"sn"`     //订单编号
+	Userid uint64 `json:"userid"` //用户id
+
+	Payment     float64 `json:"payment"`     //实际付款金额,单位是元,保留两位小数
+	Paymenttype int8    `json:"paymenttype"` //支付类型,1-在线支付
+	Postage     int     `json:"postage"`     //运费,单位是元
+	Status      int16   `json:"status"`      //订单状态:0-已取消-10-未付款，20-已付款，30-待发货 40-待收货，50-交易成功，60-交易关闭
+	CreateTime  int64   `json:"create_time"` //创建时间
+	UpdateTime  int64   `json:"update_time"` //更新时间
+}
+
+type (
+	AddOrderReq {
+		ProductId int64 `json:"productId"`
+		Quantity  int64 `json:"quantity"`
+		UserId    int64 `json:"userId"`
+		Postage   int64 `json:"postage"`
+	}
+	AddOrderResp {
+		Sn string `jaon:"sn"`
+	}
+)
+type (
+	OrderListView {
+		ProductId     int64   `json:"productId"`
+		ProductName   string  `json:"productName"`
+		ProductDetail string  `json:"productDetail"`
+		OrderId       string  `json:"orderId"`
+		State         int64   `json:"state"`
+		Quantity      int64   `json:"quantity"`
+		Payment       float64 `json:"payment"`
+		TotalPrice    float64 `json:"totalPrice"`
+		CreatTime     int64   `json:"creatTime"`
+		TradeCode     string  `json:"tradeCode"`
+	}
+
+	OrderListReq {
+		LastId     int64 `json:"lastId"`
+		PageSize   int64 `json:"pageSize"`
+		TradeState int64 `json:"tradeState"`
+	}
+
+	OrderListResp {
+		List []OrderListView `json:"list"`
+	}
+)
+
+type (
+	OrderDetailReq {
+		OrderId string `json:"orderId"`
+	}
+
+	OrderDetailResp {
+		OrderId     string `json:"orderId"`
+		UserId      int64  `json:"userId"`
+		ProductId   int64  `json:"productId"`
+		ProductName string `json:"productName"`
+		TotalPrice  int64  `json:"totalPrice"`
+		CreatTime   int64  `json:"creatTime"`
+		State       string `json:"state"`
+		TradeCode   string `json:"tradeCode"`
+
+		PayTime int64  `json:"payTime"`
+		PayType string `json:"payType"`
+	}
+)
+
+@server (
+	prefix:order/v1
+	
+)
+
+service order{
+	@doc"创建订单"
+	@handler createOrder
+	post /order/createOrder (AddOrderReq)returns(AddOrderResp)
+	
+	@doc "订单列表"
+	@handler OrderList
+	post /order/OrderList(OrderListReq)returns(OrderListResp)
+	
+	@doc"订单详情"
+	@handler OrderDetail
+	post /order/OrderDetail(OrderDetailReq)returns(OrderDetailResp)
+	
+}

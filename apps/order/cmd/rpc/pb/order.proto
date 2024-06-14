@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package order;
+option go_package = "./pb";
+
+message OrdersReq {
+  int64 user_id = 1;
+  int32 status = 2;
+  int64 cursor = 3;
+
+}
+
+message OrdersResp {
+  repeated OrderItem orders = 1;
+  bool is_end = 2;
+  string create_time = 3;
+}
+
+message OrderItem {
+  int64 id = 1;
+  string order_sn = 2;
+  int64 quantity = 3;
+  double price = 4;
+  int64 product_id = 5;
+  string product_name = 6;
+  int64 user_id = 7;
+  int64 create_time = 8;
+  int64 update_time = 9;
+
+}
+
+message CreateOrderReq{
+  int64 userId = 1;
+  int64 productId = 2;
+  int64 quantity = 3;
+}
+message CreateOrderResp{
+  string sn = 1;
+}
+
+message Orders {
+  int64 id = 1;
+  string sn = 2;
+  int64 userid = 3;
+
+  double payment = 4;
+  int64 paymenttype = 5;
+  int64 postage = 6;
+  int64 status = 7;
+  int64 createTime = 8;
+  int64 updateTime = 9;
+}
+
+message AddOrderReq {
+  int64 userid = 1;
+  int64 productid = 2;
+  int64 quantity = 3;
+  int64 postage = 4;
+
+}
+
+message AddOrderResp {
+  string sn = 1;
+}
+
+message GetOrderBySnReq {
+  string Sn = 1; //id
+}
+
+message GetOrderBySnResp {
+  Orders order = 1; //order
+}
+
+
+service Order{
+  rpc Orders(OrdersReq) returns(OrdersResp);
+  rpc CreateOrder(CreateOrderReq) returns(CreateOrderResp);
+  rpc CreateOrderCheck(CreateOrderReq) returns(CreateOrderResp);
+  rpc CreateOrderDTM(AddOrderReq) returns(AddOrderResp);
+  rpc CreateOrderDTMCancel(AddOrderReq)returns(AddOrderResp);
+  rpc GetOrderBySn(GetOrderBySnReq) returns(GetOrderBySnResp);
+  rpc RollbackOrder (CreateOrderReq) returns (CreateOrderResp);
+}
+

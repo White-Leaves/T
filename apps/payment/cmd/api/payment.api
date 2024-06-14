@@ -1,0 +1,33 @@
+syntax = "v1"
+
+info(
+	title: "支付"
+	desc: "支付"
+	
+	version: "v1"
+)
+
+type (
+	PaymentReq {
+		OrderSn     string `json:"orderSn"`
+		SerivceType string `json:"serivceType"`
+	}
+
+	PaymentResp {
+		PaySn string `json:"pay"`
+	}
+)
+
+
+
+@server(
+	prefix: payment/v1
+	group: payment
+	jwt: JwtAuth
+)
+
+service payment{
+	@doc "payment"
+	@handler Payment
+	post /Payment/Payment(PaymentReq)returns(PaymentResp)
+}

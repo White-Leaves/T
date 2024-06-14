@@ -1,0 +1,49 @@
+Name: order.rpc
+ListenOn: 0.0.0.0:2001
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: order.rpc
+
+DB:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/gomall_order?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+Prometheus:
+  Host: 0.0.0.0
+  Port: 4002
+  Path: /metrics
+
+Cache:
+  - Host: 127.0.0.1:6379
+    Pass:
+
+UserRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: user.rpc
+
+ProductRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: product.rpc
+
+
+Redis:
+  Host: 127.0.0.1:6379
+  Type: node
+  Pass:
+  Key:
+
+BizRedis:
+  Host: 127.0.0.1:6379
+  Pass:
+  Type: node
+
+JwtAuth:
+  AccessSecret: ae0536f9-6450-4606-8e13-5a19ed505da0
+  AccessExpire: 31536000
+
+
+Telemetry:
+  Endpoint: http://127.0.0.1:14268/api/traces

@@ -1,0 +1,13 @@
+Store:
+  Driver: 'mysql'
+  Host: 'mysql'
+  User: 'root'
+  Password: '123456'
+  Port: 3306
+
+
+
+MicroService:
+  Driver: 'dtm-driver-gozero'
+  Target: 'etcd://192.168.20.110:23789/dtmservice'
+  EndPoint: '0.0.0.0:36790'

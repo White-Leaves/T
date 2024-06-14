@@ -1,0 +1,30 @@
+Name: payment
+Host: 0.0.0.0
+Port: 1002
+
+JwtAuth:
+  AccessSecret: ae0536f9-6450-4606-8e13-5a19ed505da0
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 4003
+  Path: /metrics
+
+PaymentRpc:
+  Etcd:
+    -Host: 127.0.0.1:2379
+  Key: payment.rpc
+
+OrderRpc:
+  Etcd:
+    -Host: 127.0.0.1:2379
+  Key: order.rpc
+
+UserRpc:
+  Etcd:
+    -Host: 127.0.0.1:2379
+  Key: user.rpc
+
+
+Telemetry:
+  Endpoint: http://127.0.0.1:14268/api/traces

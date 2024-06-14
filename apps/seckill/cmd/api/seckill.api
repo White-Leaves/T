@@ -1,0 +1,32 @@
+syntax = "v1"
+
+info(
+	title: "秒杀"
+	desc: "秒杀"
+	
+	version: "v1"
+)
+
+type (
+	CreateSeckillReq {
+		SeckillId       int64 `json:"seckillId"`
+		ProductId       int64 `json:"productId"`
+		ProductQuantity int64 `json:"productQuantity"`
+	}
+
+	CreatSeckillResp {
+		SeckillSn string `json:"seckillSn"`
+	}
+) 
+
+@server (
+	group: seckill
+	prefix: order/v1
+	jwt: JwtAuth
+)
+
+service seckill-api{
+	@doc"创建秒杀"
+	@handler createSeckill
+	post /seckill (CreateSeckillReq)returns (CreatSeckillResp)
+}

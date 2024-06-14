@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+message CreatePaymentReq{
+  int64 uid = 1;
+  int64 payTotal = 2;
+  string orderSn = 3;
+  int64 platform = 4;
+
+}
+
+message CreatePaymentResp{
+  string sn =1;
+}
+
+message PaymentDetail{
+  int64 id = 1;
+  string sn = 2;
+  int64 uid = 3;
+  int64 tradeState = 4; // 交易状态  0:未支付 1:支付成功 -1:支付失败
+  double payTotal = 5;
+  string orderSn = 6;
+  int64 createTime = 7;
+  int64 updateTime = 8;
+  int64 payTime = 9;
+
+}
+message GetPaymentBySnReq {
+  string   sn = 1;
+}
+message GetPaymentBySnResp {
+  PaymentDetail paymentDetail = 1;
+}
+
+message GetPaymentSuccessRefundByOrderSnReq {
+  string orderSn = 1;
+}
+message GetPaymentSuccessRefundByOrderSnResp {
+  PaymentDetail paymentDetail = 1;
+}
+
+//更新交易状态
+message UpdateTradeStateReq {
+  string   sn = 1;
+  int64   tradeState = 2;
+
+}
+message UpdateTradeStateResp {
+}
+
+service payment {
+
+  rpc CreatePayment(CreatePaymentReq) returns(CreatePaymentResp);
+
+  rpc GetPaymentBySn(GetPaymentBySnReq) returns(GetPaymentBySnResp);
+  //更新交易状态
+  rpc UpdateTradeState(UpdateTradeStateReq) returns(UpdateTradeStateResp);
+  //根据订单sn查询流水记录
+  rpc GetPaymentSuccessRefundByOrderSn(GetPaymentSuccessRefundByOrderSnReq) returns(GetPaymentSuccessRefundByOrderSnResp);
+
+}

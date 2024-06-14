@@ -1,0 +1,54 @@
+syntax ="v1"
+
+info(
+	title: "商品"
+	version:"v1"
+	
+)
+
+type Product {
+	Id          int64   `json:"id"`
+	Name        string  `json:"Name"`
+	Info        string  `json:"info"`
+	Description string  `json:"description"` // 商品描述
+	Price       float64 `json:"price"`       // 商品价格
+	Stock       int64   `json:"stock"`       // 库存
+	Status      int64   `json:"status"`      // 状态：1-正常，2-下架
+	CreateTime  int64   `json:"create_time"` // 创建时间
+	UpdateTime  int64   `json:"update_time"` // 更新时间
+}
+
+type (
+	ProductListReq {
+		Page     int64 `json:"page"`
+		PageSize int64 `json:"pageSize"`
+	}
+	ProductListResp {
+		List []Product `json:"list"`
+	}
+)
+
+type (
+	ProductDetailReq {
+		Id int64 `json:"id"`
+	}
+	ProductDetailResp {
+		Product Product `json:"product"`
+	}
+)
+
+@server(
+	prefix:product/v1
+	group:product
+)
+
+service product{
+	@doc "product list"
+	@handler productList
+	post /product/productList (ProductListReq) returns (ProductListResp)
+	
+	@doc "product Detail"
+	@handler productDetail
+	post /product/productDetail (ProductDetailReq) returns (ProductDetailResp)
+	
+}

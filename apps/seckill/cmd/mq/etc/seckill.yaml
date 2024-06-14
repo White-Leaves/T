@@ -1,0 +1,21 @@
+Kafka:
+  Name: seckill_msg,
+  Brokers:
+    - 127.0.0.1:9092
+  Topic: seckill-topic
+  Group: scekill-group
+
+
+ProductRpcConf:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: product.rpc
+  NonBlock: true
+
+OrderRpcConf:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: order.rpc
+  NonBlock: true

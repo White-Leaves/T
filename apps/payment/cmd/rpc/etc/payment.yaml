@@ -1,0 +1,22 @@
+Name: payment.rpc
+ListenOn: 0.0.0.0:2002
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: payment.rpc
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 4004
+  Path: /metrics
+
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Pass: 123456
+    Type: node
+
+DB:
+  DataSource: root@123456@tcp(127.0.0.1:3306)/gomall_payment?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+
+Telemetry:
+  Endpoint: http://127.0.0.1:14268/api/traces

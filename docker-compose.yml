@@ -1,0 +1,199 @@
+version: '3'
+
+services:
+
+  nginx-gateway:
+    image: nginx:1.21.5
+    container_name: nginx-gateway
+    restart: always
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8888:8081
+    volumes:
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d
+      - ./data/nginx/log:/var/log/nginx
+    networks:
+      - gomall_net
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
+    container_name: elasticsearch
+    user: root
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./data/elasticsearch/data:/usr/share/elasticsearch/data
+    restart: always
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - gomall_net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.13.4
+    container_name: kibana
+    environment:
+      - elasticsearch.hosts=http://elasticsearch:9200
+      - TZ=Asia/Shanghai
+    restart: always
+    networks:
+      - gomall_net
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  
+  filebeat:
+    image: elastic/filebeat:7.13.4
+    container_name: filebeat
+    environment:
+
+      TZ: Asia/Shanghai
+    user: root
+    restart: always
+    entrypoint: "filebeat -e -strict.perms=false"  #解决配置文件权限问题 - Solving the configuration file permissions
+    volumes:
+      - ./deploy/filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      # 此处需指定docker的containers目录，取决于你docker的配置 - The containers directory of docker needs to be specified here, depending on your docker configuration
+      # 如snap安装的docker，则为/var/snap/docker/common/var-lib-docker/containers - Example if docker is installed by Snap /var/snap/docker/common/var-lib-docker/containers
+      # - /var/snap/docker/common/var-lib-docker/containers:/var/lib/docker/containers
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    networks:
+      - gomall_net
+    depends_on:
+      - kafka
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    environment:
+      
+      TZ: Asia/Shanghai
+    restart: always
+    ports:
+      - 2181:2181
+    networks:
+      - gomall_net
+
+  #消息队列
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - 9092:9092
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - TZ=Asia/Shanghai
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - gomall_net
+    depends_on:
+      - zookeeper
+
+  mysql:
+    image: mysql/mysql-server:8.0.28
+    container_name: mysql
+    environment:
+
+      TZ: Asia/Shanghai
+
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - 3306:3306
+    volumes:
+
+      - ./data/mysql/data:/var/lib/mysql
+      # 日志
+    command:
+      # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
+
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    privileged: true
+    restart: always
+    networks:
+      - gomall_net
+
+  redis:
+    image: redis:6.2.5
+    container_name: redis
+    ports:
+      - 36379:6379
+    environment:
+
+      TZ: Asia/Shanghai
+    volumes:
+
+      - ./data/redis/data:/data:rw
+    command: "redis-server --requirepass G62m50oigInC30sf  --appendonly yes"
+    privileged: true
+    restart: always
+    networks:
+      - gomall_net
+
+
+  dtm:
+    image: yedf/dtm
+    environment:
+      - TZ=Asia/Shanghai
+    entrypoint:
+      - "/app/dtm/dtm"
+      - "-c=/app/dtm/configs/config.yaml"
+    privileged: true
+    volumes: #把本地文件挂载到容器里的指定的目录
+      - ./dtm/config.yml:/app/dtm/configs/config.yaml # 将 dtm 配置文件挂载到容器里
+    ports:
+     - "36789:36789"  # DTM HTTP 协议端口号
+     - "36790:36790"  # DTM gRPC 协议端口号
+    networks:
+     - gomall_net
+    restart: always
+
+  etcd:
+    image: bitnami/etcd
+    container_name: etcd
+    environment:
+      - TZ=Asia/Shanghai
+      - ALLOW_NONE_AUTHENTICATION=yes
+      #- ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://127.0.0.1:2379
+    ports: # 设置端口映射 Etcd 服务映射宿主机端口号，可在宿主机127.0.0.1:2379访问
+      - "2379:2379"
+    networks:
+      - gomall_net
+    restart: always
+
+  etcdManage:
+    image: evildecay/etcdkeeper
+    container_name: etcdManage
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "7000:8080"       # 设置容器8080端口映射指定宿主机端口，用于宿主机访问可视化web
+    depends_on:
+      - etcd
+    networks:
+      - gomall_net
+    restart: always
+
+
+networks:
+  gomall_net:
+    driver: bridge
+    ipam:
+     config:
+      - subnet: 172.20.0.0/16

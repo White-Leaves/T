@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+message ProductItem{
+  int64 id = 1;
+  int64 del_state = 2;
+  string name = 3;
+  string info = 4;
+
+  int64 price = 5;
+  int64 stock = 6;
+  int64 status = 7;
+  int64 seckill_stock = 8;
+}
+message ProductItemRequest {
+  int64 id = 1;
+}
+
+message ProductDetailReq{
+  int64 id = 1;
+}
+
+message ProductDetailResp{
+  ProductItem product = 1;
+}
+
+message UpdateProductStockReq {
+  int64 product_id = 1;
+  int64 num = 2;
+}
+
+message UpdateProductStockResp {
+}
+
+message CheckAndUpdateStockReq {
+  int64 product_id = 1;
+}
+
+message CheckAndUpdateStockResp {
+}
+
+message DecrStockReq{
+  int64 id = 1;
+  int64 num = 2;
+}
+
+message DecrStockResp {
+}
+
+
+service product{
+  rpc product(ProductItemRequest) returns(ProductItem);
+  rpc productDetail(ProductDetailReq) returns(ProductDetailResp);
+  rpc UpdateProductStock(UpdateProductStockReq) returns (UpdateProductStockResp);
+  rpc CheckAndUpdateStock(CheckAndUpdateStockReq) returns (CheckAndUpdateStockResp);
+  rpc CheckProductStock(UpdateProductStockReq) returns (UpdateProductStockResp);
+  rpc RollbackProductStock(UpdateProductStockReq) returns (UpdateProductStockResp);
+  rpc DecrStock(DecrStockReq) returns(DecrStockResp);
+  rpc DecrStockCancel(DecrStockReq) returns(DecrStockResp);
+}
